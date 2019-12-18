@@ -11,7 +11,19 @@
 </div>
 <script src="https://unpkg.com/vue"></script>
 <script>
-    var eventsLog = new Vue({
+    // Раскомментировать необъодимую строчку данных
+    // let dataForSelect = ['test_1', 'test_2', 'test_3'];
+    let dataForSelect = [{title: 'Test_1', value: 'test_1'}, {title: 'Test_2', value: 'test_2'}, {title: 'Test_3', value: 'test_3'}];
+    // let dataForSelect = {element1: 'test_1', element2: 'test_2', element3: 'test_3'};
+    // let dataForSelect = {element1: {title: 'Test_1', value: 'test_1'}, element2: {title: 'Test_2', value: 'test_2'}, element3: {title: 'Test_3', value: 'test_3'}};
+
+    // let dataForSelect = [{name: 'Test_1', id: 'test_1'}, {name: 'Test_2', id: 'test_2'}, {name: 'Test_3', id: 'test_3'}];
+    //let dataForSelect = {element1: {name: 'Test_1', id: 'test_1'}, element2: {name: 'Test_2', id: 'test_2'}, element3: {name: 'Test_3', id: 'test_3'}};
+
+    // Раскомментировать, если используются ключи не по умолчанию
+    // let propsNamesInData = {title: 'name', value: 'id'};
+
+    let eventsLog = new Vue({
         el: '#eventsLog',
         data: {
             tittle: 'Events log:',
@@ -21,16 +33,33 @@
 
     Vue.component('test-selector', {
         data: function () {
+            let processedData = [];
+            let propsNames = typeof propsNamesInData !== 'undefined' ? {title: propsNamesInData.title, value: propsNamesInData.value} : {title: 'title', value: 'value'};
+            if (dataForSelect instanceof Array) {
+                dataForSelect.forEach(function(element){
+                    processedData.push({title: !!element[propsNames.title] ? element[propsNames.title] : element, value: !!element[propsNames.value] ? element[propsNames.value] : element});
+                });
+            } else {
+                for (let element in dataForSelect){
+                    let tempData = dataForSelect[element];
+                    processedData.push({title: !!tempData[propsNames.title] ? tempData[propsNames.title] : tempData, value: !!tempData[propsNames.value] ? tempData[propsNames.value] : tempData});
+                }
+            }
+
             return {
-                selected: ''
+                selected: '',
+                options: processedData
             }
         },
-        template: '<select v-model="selected"><option value="test_1">Test_1</option><option value="test_2">Test_2</option><option value="test_3">Test_3</option></select>',
+        template: '<select v-model="selected"><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></select>',
         watch: {
             selected: function(newValue, oldValue){
                 eventsLog.logEvents.push({message: 'Input ' + newValue});
                 eventsLog.logEvents.push({message: 'Change from ' + (!!oldValue ? oldValue : 'nothing') + ' to ' + newValue});
             }
+        },
+        methods: {
+
         }
     });
     new Vue({ el: '#test' });

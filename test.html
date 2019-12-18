@@ -1,18 +1,37 @@
 <html>
 <body>
-<div id="example">
-    <div id="test">
-        <test-selector></test-selector>
-    </div>
+<div id="test">
+    <test-selector></test-selector>
+</div>
+<div id="eventsLog">
+    <span>{{tittle}}</span>
+    <li v-for="event in logEvents">
+        {{event.message}}
+    </li>
 </div>
 <script src="https://unpkg.com/vue"></script>
 <script>
+    var eventsLog = new Vue({
+        el: '#eventsLog',
+        data: {
+            tittle: 'Events log:',
+            logEvents: []
+        }
+    });
+
     Vue.component('test-selector', {
         data: function () {
             return {
+                selected: ''
             }
         },
-        template: '<select><option value="test_1">Test_1</option><option value="test_2">Test_2</option><option value="test_3">Test_3</option></select>'
+        template: '<select v-model="selected"><option value="test_1">Test_1</option><option value="test_2">Test_2</option><option value="test_3">Test_3</option></select>',
+        watch: {
+            selected: function(newValue, oldValue){
+                eventsLog.logEvents.push({message: 'Input ' + newValue});
+                eventsLog.logEvents.push({message: 'Change from ' + (!!oldValue ? oldValue : 'nothing') + ' to ' + newValue});
+            }
+        }
     });
     new Vue({ el: '#test' });
 </script>

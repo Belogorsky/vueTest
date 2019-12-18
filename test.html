@@ -1,0 +1,20 @@
+<html>
+<body>
+<div id="example">
+    <div id="test">
+        <test-selector></test-selector>
+    </div>
+</div>
+<script src="https://unpkg.com/vue"></script>
+<script>
+    Vue.component('test-selector', {
+        data: function () {
+            return {
+            }
+        },
+        template: '<select><option value="test_1">Test_1</option><option value="test_2">Test_2</option><option value="test_3">Test_3</option></select>'
+    });
+    new Vue({ el: '#test' });
+</script>
+</body>
+</html>

@@ -5,7 +5,12 @@
     <button @click="focusClick">Focus</button>
     <button @click="disableClick">Disabled</button>
     <div id="testSelector">
-        <test-selector v-bind:is-disabled="isDisabled" v-bind:is-focus="isFocus"></test-selector>
+        <test-selector
+                :data-for-select="dataForSelect"
+                :props-names-in-data="propsNamesInData"
+                :is-disabled="isDisabled"
+                :is-focus="isFocus"
+        ></test-selector>
     </div>
 </div>
 <div id="eventsLog">
@@ -18,25 +23,13 @@
     Vue.component('test-selector', {
         props: {
             isDisabled: Boolean,
-            isFocus: Boolean
+            isFocus: Boolean,
+            dataForSelect: [Array, Object],
+            propsNamesInData: Object
         },
         data: function () {
-            let processedData = [];
-            let propsNames = typeof propsNamesInData !== 'undefined' ? {title: propsNamesInData.title, value: propsNamesInData.value} : {title: 'title', value: 'value'};
-            if (dataForSelect instanceof Array) {
-                dataForSelect.forEach(function(element){
-                    processedData.push({title: !!element[propsNames.title] ? element[propsNames.title] : element, value: !!element[propsNames.value] ? element[propsNames.value] : element});
-                });
-            } else {
-                for (let element in dataForSelect){
-                    let tempData = dataForSelect[element];
-                    processedData.push({title: !!tempData[propsNames.title] ? tempData[propsNames.title] : tempData, value: !!tempData[propsNames.value] ? tempData[propsNames.value] : tempData});
-                }
-            }
-
             return {
-                selected: '',
-                options: processedData
+                selected: ''
             }
         },
         template: '<select v-model="selected" ref="selectRef" v-bind:disabled="isDisabled"><option value="" disabled hidden>Choose</option><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></select>',
@@ -49,28 +42,46 @@
                 this.$refs.selectRef.focus();
             }
         },
+        computed: {
+            options: function(){
+                let processedData = [];
+                let propsNames = typeof this.propsNamesInData !== 'undefined' ? {title: this.propsNamesInData.title, value: this.propsNamesInData.value} : {title: 'title', value: 'value'};
+                if (this.dataForSelect instanceof Array) {
+                    this.dataForSelect.forEach(function(element){
+                        processedData.push({title: !!element[propsNames.title] ? element[propsNames.title] : element, value: !!element[propsNames.value] ? element[propsNames.value] : element});
+                    });
+                } else {
+                    for (let element in this.dataForSelect){
+                        let tempData = this.dataForSelect[element];
+                        processedData.push({title: !!tempData[propsNames.title] ? tempData[propsNames.title] : tempData, value: !!tempData[propsNames.value] ? tempData[propsNames.value] : tempData});
+                    }
+                }
+                return processedData;
+            }
+        },
         methods: {
 
         }
     });
 
-    // Раскомментировать необъодимую строчку данных
-    // let dataForSelect = ['test_1', 'test_2', 'test_3'];
-    let dataForSelect = [{title: 'Test_1', value: 'test_1'}, {title: 'Test_2', value: 'test_2'}, {title: 'Test_3', value: 'test_3'}];
-    // let dataForSelect = {element1: 'test_1', element2: 'test_2', element3: 'test_3'};
-    // let dataForSelect = {element1: {title: 'Test_1', value: 'test_1'}, element2: {title: 'Test_2', value: 'test_2'}, element3: {title: 'Test_3', value: 'test_3'}};
-
-    // let dataForSelect = [{name: 'Test_1', id: 'test_1'}, {name: 'Test_2', id: 'test_2'}, {name: 'Test_3', id: 'test_3'}];
-    //let dataForSelect = {element1: {name: 'Test_1', id: 'test_1'}, element2: {name: 'Test_2', id: 'test_2'}, element3: {name: 'Test_3', id: 'test_3'}};
-
-    // Раскомментировать, если используются ключи не по умолчанию
-    // let propsNamesInData = {title: 'name', value: 'id'};
-
     let test = new Vue({
         el: '#test',
         data: {
             isDisabled: false,
-            isFocus: false
+            isFocus: false,
+            // Раскомментировать необъодимую строчку данных
+            // dataForSelect: ['test_1', 'test_2', 'test_3'],
+            dataForSelect: [{title: 'Test_1', value: 'test_1'}, {title: 'Test_2', value: 'test_2'}, {title: 'Test_3', value: 'test_3'}],
+            // dataForSelect: {element1: 'test_1', element2: 'test_2', element3: 'test_3'},
+            // dataForSelect: {element1: {title: 'Test_1', value: 'test_1'}, element2: {title: 'Test_2', value: 'test_2'}, element3: {title: 'Test_3', value: 'test_3'}},
+
+            // dataForSelect: [{name: 'Test_1', id: 'test_1'}, {name: 'Test_2', id: 'test_2'}, {name: 'Test_3', id: 'test_3'}],
+            // dataForSelect: {element1: {name: 'Test_1', id: 'test_1'}, element2: {name: 'Test_2', id: 'test_2'}, element3: {name: 'Test_3', id: 'test_3'}},
+
+            // Закоментировать, если используются ключи не по умолчанию
+            propsNamesInData: undefined,
+            // Раскомментировать, если используются ключи не по умолчанию
+            // propsNamesInData: {title: 'name', value: 'id'}
         },
         methods: {
             disableClick: function(){

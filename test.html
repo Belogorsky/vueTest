@@ -1,7 +1,12 @@
 <html>
 <body>
+<script src="https://unpkg.com/vue"></script>
 <div id="test">
-    <test-selector></test-selector>
+    <button @click="focusClick">Focus</button>
+    <button @click="disableClick">Disabled</button>
+    <div id="testSelector">
+        <test-selector v-bind:is-disabled="isDisabled" v-bind:is-focus="isFocus"></test-selector>
+    </div>
 </div>
 <div id="eventsLog">
     <span>{{tittle}}</span>
@@ -9,29 +14,12 @@
         {{event.message}}
     </li>
 </div>
-<script src="https://unpkg.com/vue"></script>
 <script>
-    // Раскомментировать необъодимую строчку данных
-    // let dataForSelect = ['test_1', 'test_2', 'test_3'];
-    let dataForSelect = [{title: 'Test_1', value: 'test_1'}, {title: 'Test_2', value: 'test_2'}, {title: 'Test_3', value: 'test_3'}];
-    // let dataForSelect = {element1: 'test_1', element2: 'test_2', element3: 'test_3'};
-    // let dataForSelect = {element1: {title: 'Test_1', value: 'test_1'}, element2: {title: 'Test_2', value: 'test_2'}, element3: {title: 'Test_3', value: 'test_3'}};
-
-    // let dataForSelect = [{name: 'Test_1', id: 'test_1'}, {name: 'Test_2', id: 'test_2'}, {name: 'Test_3', id: 'test_3'}];
-    //let dataForSelect = {element1: {name: 'Test_1', id: 'test_1'}, element2: {name: 'Test_2', id: 'test_2'}, element3: {name: 'Test_3', id: 'test_3'}};
-
-    // Раскомментировать, если используются ключи не по умолчанию
-    // let propsNamesInData = {title: 'name', value: 'id'};
-
-    let eventsLog = new Vue({
-        el: '#eventsLog',
-        data: {
-            tittle: 'Events log:',
-            logEvents: []
-        }
-    });
-
     Vue.component('test-selector', {
+        props: {
+            isDisabled: Boolean,
+            isFocus: Boolean
+        },
         data: function () {
             let processedData = [];
             let propsNames = typeof propsNamesInData !== 'undefined' ? {title: propsNamesInData.title, value: propsNamesInData.value} : {title: 'title', value: 'value'};
@@ -51,18 +39,56 @@
                 options: processedData
             }
         },
-        template: '<select v-model="selected"><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></select>',
+        template: '<select v-model="selected" ref="selectRef" v-bind:disabled="isDisabled"><option value="" disabled hidden>Choose</option><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></select>',
         watch: {
             selected: function(newValue, oldValue){
                 eventsLog.logEvents.push({message: 'Input ' + newValue});
                 eventsLog.logEvents.push({message: 'Change from ' + (!!oldValue ? oldValue : 'nothing') + ' to ' + newValue});
+            },
+            isFocus: function(){
+                this.$refs.selectRef.focus();
             }
         },
         methods: {
 
         }
     });
-    new Vue({ el: '#test' });
+
+    // Раскомментировать необъодимую строчку данных
+    // let dataForSelect = ['test_1', 'test_2', 'test_3'];
+    let dataForSelect = [{title: 'Test_1', value: 'test_1'}, {title: 'Test_2', value: 'test_2'}, {title: 'Test_3', value: 'test_3'}];
+    // let dataForSelect = {element1: 'test_1', element2: 'test_2', element3: 'test_3'};
+    // let dataForSelect = {element1: {title: 'Test_1', value: 'test_1'}, element2: {title: 'Test_2', value: 'test_2'}, element3: {title: 'Test_3', value: 'test_3'}};
+
+    // let dataForSelect = [{name: 'Test_1', id: 'test_1'}, {name: 'Test_2', id: 'test_2'}, {name: 'Test_3', id: 'test_3'}];
+    //let dataForSelect = {element1: {name: 'Test_1', id: 'test_1'}, element2: {name: 'Test_2', id: 'test_2'}, element3: {name: 'Test_3', id: 'test_3'}};
+
+    // Раскомментировать, если используются ключи не по умолчанию
+    // let propsNamesInData = {title: 'name', value: 'id'};
+
+    let test = new Vue({
+        el: '#test',
+        data: {
+            isDisabled: false,
+            isFocus: false
+        },
+        methods: {
+            disableClick: function(){
+                this.isDisabled = !this.isDisabled;
+            },
+            focusClick: function (){
+                this.isFocus = !this.isFocus;
+            }
+        }
+    });
+
+    let eventsLog = new Vue({
+        el: '#eventsLog',
+        data: {
+            tittle: 'Events log:',
+            logEvents: []
+        }
+    });
 </script>
 </body>
 </html>

@@ -11,8 +11,11 @@
                 :is-disabled="isDisabled"
                 :is-focus="isFocus"
         >
-            <template v-slot=placeholderSlot>
+            <template v-slot:placeholder-slot>
                 <option value="" disabled hidden>{{selectPlaceholder}}</option>
+            </template>
+            <template v-slot:options-slot="slotProps">
+                <option v-for="option in slotProps.options" v-bind:value="option.value">{{option.title}}_custom</option>
             </template>
         </test-selector>
     </div>
@@ -36,7 +39,7 @@
                 selected: ''
             }
         },
-        template: '<select v-model="selected" ref="selectRef" v-bind:disabled="isDisabled"><template><slot><option value="" disabled hidden>Choose</option></slot><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></template></select>',
+        template: '<select v-model="selected" ref="selectRef" v-bind:disabled="isDisabled"><template><slot name="placeholder-slot"><option value="" disabled hidden>Choose</option></slot><slot v-bind:options="options" name="options-slot"><option v-for="option in options" v-bind:value="option.value">{{option.title}}</option></slot></template></select>',
         watch: {
             selected: function(newValue, oldValue){
                 eventsLog.logEvents.push({message: 'Input ' + newValue});
